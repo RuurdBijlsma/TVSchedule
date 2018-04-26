@@ -12,8 +12,9 @@
             </div>
             <div class="search-section">
                 <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Search series">
-                    <i class="material-icons search-icon">search</i>
+                    <input type="text" class="search-input" placeholder="Search series" v-model="query"
+                           v-on:keydown="checkSearchKey">
+                    <i v-on:click="search" class="material-icons search-icon">search</i>
                 </div>
             </div>
             <div class="user-section">
@@ -34,9 +35,10 @@
         </aside>
         <div class="main">
             <div class="main-content">
-                <schedule-tab v-if="pageIndex===0"></schedule-tab>
-                <watch-list v-if="pageIndex===1"></watch-list>
-                <preferences v-if="pageIndex===2"></preferences>
+                <schedule-tab v-if="pageIndex === 0"></schedule-tab>
+                <watch-list v-if="pageIndex === 1"></watch-list>
+                <preferences v-if="pageIndex === 2"></preferences>
+                <series-search v-if="pageIndex === 3" v-bind:searchQuery="searchQuery"></series-search>
             </div>
         </div>
         <footer class="footer"></footer>
@@ -47,13 +49,19 @@
     import ScheduleTab from "./ScheduleTab";
     import WatchList from "./WatchList";
     import Preferences from "./Preferences";
+    import SeriesSearch from "./SeriesSearch";
+    import swal from 'sweetalert';
+
 
     export default {
         name: 'FrontPage',
-        components: {Preferences, WatchList, ScheduleTab},
+        components: {SeriesSearch, Preferences, WatchList, ScheduleTab},
         props: ['username'],
         data() {
             return {
+                searchResult: {},
+                query: "",
+                searchQuery: "",
                 pageIndex: 0,
                 pages: [
                     {
@@ -75,8 +83,16 @@
         methods: {
             logout: function () {
                 this.$emit('logout');
+            },
+            search: async function () {
+                this.searchQuery = this.query;
+                this.pageIndex = 3;
+            },
+            checkSearchKey: function (e) {
+                if (e.key === "Enter")
+                    this.search();
             }
-        }
+        },
     }
 </script>
 

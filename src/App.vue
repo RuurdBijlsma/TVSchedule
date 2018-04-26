@@ -9,6 +9,7 @@
     import FrontPage from './components/FrontPage.vue'
     import LoginPage from './components/LoginPage';
     import firebase from 'firebase';
+    import _ from 'firebase/firestore';
     import swal from 'sweetalert';
 
     // Initialize Firebase
@@ -23,7 +24,11 @@
     firebase.initializeApp(config);
 
     export default {
-        mounted(){
+        mounted() {
+            firebase.firestore().settings({
+                timestampsInSnapshots: true
+            });
+
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
                     this.username = user.email;

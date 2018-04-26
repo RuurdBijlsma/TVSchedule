@@ -41,8 +41,8 @@
                 }
             },
             register: async function () {
-                const auth = firebase.auth();
                 const firestore = firebase.firestore();
+                const auth = firebase.auth();
 
                 try {
                     await auth.createUserWithEmailAndPassword(this.email, this.password);
@@ -51,6 +51,7 @@
                     await firestore.collection('users').doc(user.uid).set({
                         uid: user.uid,
                         email: user.email,
+                        watchList: []
                     });
                 } catch (e) {
                     swal("Registering failed", e.message, "error");
