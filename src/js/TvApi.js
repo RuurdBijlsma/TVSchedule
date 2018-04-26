@@ -1,7 +1,7 @@
 import ProxyApi from './ProxyApi';
 
 export default class TvApi extends ProxyApi {
-    constructor() {
+    constructor(token) {
         super("https://api.thetvdb.com/");
 
         this.language = 'en';
@@ -10,10 +10,11 @@ export default class TvApi extends ProxyApi {
         let userName = "rutenl";
         let apiKey = "1ADD2E514EEF77D1";
 
-        this.getToken(userKey, userName, apiKey).then(token => {
-            this.token = token.token;
-            this.fire('token');
-        });
+        if (!token)
+            this.getToken(userKey, userName, apiKey).then(token => {
+                this.token = token.token;
+                this.fire('token');
+            });
     }
 
     async request(method, body, ...params) {
@@ -41,5 +42,9 @@ export default class TvApi extends ProxyApi {
         return await this.get({
             name: query
         }, 'search', 'series');
+    }
+
+    async series(id) {
+        return await this.get({}, 'series', id);
     }
 }

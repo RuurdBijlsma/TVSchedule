@@ -21,6 +21,8 @@
     import firebase from 'firebase';
     import _ from 'firebase/firestore';
     import swal from 'sweetalert';
+    import TvApi from '../js/TvApi';
+    const api = new TvApi();
 
     export default {
         name: "LoginPage",
@@ -50,7 +52,6 @@
                     await user.sendEmailVerification();
                     await firestore.collection('users').doc(user.uid).set({
                         uid: user.uid,
-                        email: user.email,
                         watchList: []
                     });
                 } catch (e) {

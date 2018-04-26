@@ -1,10 +1,7 @@
 <template>
     <div class="schedule-tab">
         <div class="content-section content-today">
-            <div class="content-header">
-                <i class="material-icons content-header-icon">check</i>
-                <span class="content-header-name">Available today</span>
-            </div>
+            <content-header v-bind:value="'Available today'" v-bind:icon="'check'"></content-header>
             <div class="content-body">
                 <div class="today-episodes">
                     <div class="episode-large">
@@ -22,10 +19,7 @@
             </div>
         </div>
         <div class="content-section content-schedule">
-            <div class="content-header">
-                <i class="material-icons content-header-icon">schedule</i>
-                <span class="content-header-name">Schedule</span>
-            </div>
+            <content-header v-bind:value="'Schedule'" v-bind:icon="'schedule'"></content-header>
             <div class="content-body">
                 <div class="schedule-grid">
                     <div class="schedule-days">
@@ -202,33 +196,14 @@
 </template>
 
 <script>
+    import ContentHeader from "./ContentHeader";
     export default {
-        name: "ScheduleTab"
+        name: "ScheduleTab",
+        components: {ContentHeader}
     }
 </script>
 
 <style scoped>
-    .content-header {
-        font-size: 20px;
-        font-weight: bold;
-        line-height: 20px;
-        vertical-align: middle;
-        display: flex;
-    }
-
-    .content-header * {
-        line-height: 30px;
-        height: 30px;
-        display: inline-block;
-    }
-
-    .content-header-icon {
-        color: var(--primary-color);
-    }
-
-    .content-header-name {
-        margin-left: 10px;
-    }
 
     .content-body {
         width: 100%;

@@ -36,9 +36,10 @@
         <div class="main">
             <div class="main-content">
                 <schedule-tab v-if="pageIndex === 0"></schedule-tab>
-                <watch-list v-if="pageIndex === 1"></watch-list>
+                <watch-list v-if="pageIndex === 1" v-bind:token="token"></watch-list>
                 <preferences v-if="pageIndex === 2"></preferences>
-                <series-search v-if="pageIndex === 3" v-bind:searchQuery="searchQuery"></series-search>
+                <series-search v-if="pageIndex === 3" v-bind:searchQuery="searchQuery"
+                               v-bind:token="token"></series-search>
             </div>
         </div>
         <footer class="footer"></footer>
@@ -51,14 +52,24 @@
     import Preferences from "./Preferences";
     import SeriesSearch from "./SeriesSearch";
     import swal from 'sweetalert';
+    import TvApi from '../js/TvApi';
 
 
     export default {
+        mounted() {
+            this.api = new TvApi();
+            this.api.on('token', () => {
+                this.token = this.api.token
+                ;console.log(this.api);
+            });
+        },
         name: 'FrontPage',
         components: {SeriesSearch, Preferences, WatchList, ScheduleTab},
         props: ['username'],
         data() {
             return {
+                api: {},
+                token: '',
                 searchResult: {},
                 query: "",
                 searchQuery: "",
