@@ -1,22 +1,26 @@
 <template>
     <div class="login-page">
-        <form>
+        <form @submit.prevent="login">
             <h2>Login</h2>
             <p>E-mail</p>
             <input class="text-input" type="email" name="email" placeholder="example@mail.com" v-model="email">
-            <p>Password</p>
+            <div class="center-passwords">
+                <p>Password</p>
+                <input type="button" value="Reset password" class="forgot-password" v-on:click="forgotPassword">
+            </div>
             <input class="text-input" type="password" name="password" placeholder="********" v-model="password">
             <div class="buttons">
-                <input class="register-button" type="button" value="Register" v-on:click="register()">
-                <input class="login-button" type="button" value="Login" v-on:click="login()">
+                <input class="register-button" type="button" value="Register" v-on:click="register">
+                <input class="login-button" type="submit" value="Login" v-on:click="login">
             </div>
         </form>
     </div>
 </template>
 
 <script>
-    import FireBase from 'firebase';
-
+    import firebase from 'firebase';
+    import _ from 'firebase/firestore';
+    import swal from 'sweetalert';
 
     export default {
         name: "LoginPage",
@@ -28,31 +32,52 @@
         },
         methods: {
             login: async function () {
-                const auth = FireBase.auth();
-                console.log(this.email, this.password);
-                let credentials;
+                const auth = firebase.auth();
+
                 try {
-                    credentials = await auth.signInWithEmailAndPassword(this.email, this.password);
+                    await auth.signInWithEmailAndPassword(this.email, this.password);
                 } catch (e) {
-                    console.warn("Login failed", e.message);
+                    swal("Login failed", e.message, "error");
                 }
-                console.log("Login success!", credentials);
             },
             register: async function () {
-                const auth = FireBase.auth();
-                let credentials;
+                const auth = firebase.auth();
+                const firestore = firebase.firestore();
+
                 try {
-                    credentials = await auth.createUserWithEmailAndPassword(this.email, this.password);
+                    await auth.createUserWithEmailAndPassword(this.email, this.password);
+                    let user = auth.currentUser;
+                    await user.sendEmailVerification();
+                    await firestore.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        email: user.email,
+                    });
                 } catch (e) {
-                    console.warn("Register failed", e.message);
+                    swal("Registering failed", e.message, "error");
                 }
-                console.log("Register success!", credentials);
+            },
+            forgotPassword: async function () {
+                const auth = firebase.auth();
+                try {
+                    await auth.sendPasswordResetEmail(this.email);
+                    swal("Password reset email sent!", "", "success");
+                } catch (e) {
+                    swal("Forgot password failed", e.message, "error");
+                }
             }
         }
     }
 </script>
 
 <style scoped>
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        transition: background-color 100000000s ease-in-out 0s;
+        -webkit-text-fill-color: var(--foreground-color) !important;
+    }
+
     .login-page {
         display: flex;
         justify-content: center;
@@ -75,8 +100,25 @@
         top: 50px;
     }
 
+    .center-passwords {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
     form > p {
         margin-top: 15px;
+    }
+
+    .forgot-password {
+        font-family: Montserrat, sans-serif;
+        display: inline-block;
+        width: 120px;
+        text-align: right;
+        background-color: transparent;
+        border: none;
+        color: var(--primary-color);
+        float: right;
     }
 
     h2 {

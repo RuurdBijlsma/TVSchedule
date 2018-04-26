@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "firebase": "^4.13.1",
+    "sweetalert": "^2.1.0",
     "vue": "^2.5.13"
   },
   "devDependencies": {

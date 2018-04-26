@@ -17,31 +17,26 @@
                 </div>
             </div>
             <div class="user-section">
-                <div class="user">
+                <div class="user" v-on:click="logout" title="Click to sign out">
                     <i class="material-icons user-face">face</i>
-                    <span class="user-name">RuteNL</span>
+                    <span class="user-name">{{username}}</span>
                 </div>
             </div>
         </header>
         <aside class="left-menu">
             <div class="menu-items">
-                <div class="menu-item" active="true">
-                    <i class="material-icons menu-icon">schedule</i>
-                    <span class="menu-item-name">Schedule</span>
-                </div>
-                <div class="menu-item" active="false">
-                    <i class="material-icons menu-icon">playlist_play</i>
-                    <span class="menu-item-name">Watch List</span>
-                </div>
-                <div class="menu-item" active="false">
-                    <i class="material-icons menu-icon">settings</i>
-                    <span class="menu-item-name">Preferences</span>
+                <div class="menu-item" v-bind:active="index === pageIndex" v-for="(page, index) in pages"
+                     v-on:click="pageIndex = index">
+                    <i class="material-icons menu-icon">{{page.icon}}</i>
+                    <span class="menu-item-name">{{page.name}}</span>
                 </div>
             </div>
         </aside>
         <div class="main">
             <div class="main-content">
-                <schedule-tab></schedule-tab>
+                <schedule-tab v-if="pageIndex===0"></schedule-tab>
+                <watch-list v-if="pageIndex===1"></watch-list>
+                <preferences v-if="pageIndex===2"></preferences>
             </div>
         </div>
         <footer class="footer"></footer>
@@ -50,9 +45,38 @@
 
 <script>
     import ScheduleTab from "./ScheduleTab";
+    import WatchList from "./WatchList";
+    import Preferences from "./Preferences";
+
     export default {
         name: 'FrontPage',
-        components: {ScheduleTab},
+        components: {Preferences, WatchList, ScheduleTab},
+        props: ['username'],
+        data() {
+            return {
+                pageIndex: 0,
+                pages: [
+                    {
+                        name: "Schedule",
+                        icon: "schedule"
+                    },
+                    {
+                        name: "Watch List",
+                        icon: "playlist_play"
+
+                    },
+                    {
+                        name: "Preferences",
+                        icon: "settings"
+                    }
+                ]
+            }
+        },
+        methods: {
+            logout: function () {
+                this.$emit('logout');
+            }
+        }
     }
 </script>
 
@@ -66,6 +90,7 @@
     .front-page > * {
         flex: 1 100%;
     }
+
     .header {
         height: var(--header-height);
         display: flex;
@@ -175,9 +200,9 @@
         justify-content: center;
     }
 
-    @media(min-width: 1700px) {
+    @media (min-width: 1700px) {
         .main-content {
-            transform: translateX(calc(0 - var(--aside-width) / 2));
+            transform: translateX(calc(0px - var(--aside-width) / 2));
         }
     }
 

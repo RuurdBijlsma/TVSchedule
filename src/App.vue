@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <front-page v-if="loggedIn"></front-page>
+        <front-page v-if="loggedIn" v-on:logout="logout" v-bind:username="username"></front-page>
         <login-page v-else></login-page>
     </div>
 </template>
@@ -8,7 +8,8 @@
 <script>
     import FrontPage from './components/FrontPage.vue'
     import LoginPage from './components/LoginPage';
-    import FireBase from 'firebase/app';
+    import firebase from 'firebase';
+    import swal from 'sweetalert';
 
     // Initialize Firebase
     const config = {
@@ -19,9 +20,19 @@
         storageBucket: "televisionschedule-69ccd.appspot.com",
         messagingSenderId: "303300331151"
     };
-    FireBase.initializeApp(config);
+    firebase.initializeApp(config);
 
     export default {
+        mounted(){
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    this.username = user.email;
+                    this.loggedIn = true;
+                } else {
+                    this.loggedIn = false;
+                }
+            });
+        },
         name: 'app',
         components: {
             LoginPage,
@@ -29,7 +40,19 @@
         },
         data() {
             return {
-                loggedIn: false
+                username: "",
+                loggedIn: true
+            }
+        },
+        methods: {
+            logout: async function () {
+                console.log('hier');
+                try {
+                    const auth = firebase.auth();
+                    await auth.signOut();
+                } catch (e) {
+                    swal("Logout failed", e.message, "error");
+                }
             }
         }
     }
@@ -53,6 +76,8 @@
 
     html, body {
         height: 100%;
+
+        font-family: 'Montserrat', sans-serif;
     }
 
     #app {
@@ -64,8 +89,6 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-
-        font-family: 'Montserrat', sans-serif;
 
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
